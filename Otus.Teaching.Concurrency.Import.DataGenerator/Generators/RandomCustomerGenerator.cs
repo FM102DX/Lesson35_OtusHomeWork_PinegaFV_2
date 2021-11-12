@@ -8,6 +8,7 @@ namespace Otus.Teaching.Concurrency.Import.DataGenerator.Generators
 {
     public static class RandomCustomerGenerator
     {
+        
         public static List<Customer> Generate(int dataCount)
         {
             var customers = new List<Customer>();

@@ -14,7 +14,7 @@ namespace Otus.Teaching.Concurrency.Import.Core.Entities
 
         public override string ToString()
         {
-            return $"{Id} {FullName} {Email} {Phone}";
+            return $"{Id} {FullName} {Email} {Phone} ";
         }
     }
 }

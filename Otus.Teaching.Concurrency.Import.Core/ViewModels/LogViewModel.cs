@@ -5,7 +5,8 @@ namespace Otus.Teaching.Concurrency.Import.Core.ViewModels
 {
     public class LogViewModel
     {
-        public IEnumerable<ConsoleToApiMessage> MyMessageList { get; set; }
+        public IEnumerable<ConsoleToApiMessage> MyMessagesList { get; set; }
+        public IEnumerable<Customer> MyCustomersList { get; set; }
 
     }
 }

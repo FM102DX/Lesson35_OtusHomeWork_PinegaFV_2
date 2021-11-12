@@ -42,9 +42,8 @@ namespace Otus.Teaching.Concurrency.Import.DataAccess.Data
 
             */
 
-            modelBuilder.Entity<Customer>();
-
             modelBuilder.Entity<ConsoleToApiMessage>().Property(b => b.Id).ValueGeneratedOnAdd();
+            modelBuilder.Entity<Customer>().Property(b => b.Id).ValueGeneratedOnAdd();
 
             base.OnModelCreating(modelBuilder);
         }

@@ -26,5 +26,10 @@ namespace Otus.Teaching.Concurrency.Import.Core.Service
         public static CommonOperationResult sayFail(string _msg = "") { return getInstance(false, _msg, null); }
         public static CommonOperationResult sayOk(string _msg = "") { return getInstance(true, _msg, null); }
         public static CommonOperationResult sayItsNull(string _msg = "") { return getInstance(true, _msg, null); }
+
+        public override string ToString()
+        {
+            return $"success:{success}, msg: {msg}, returningValue:{returningValue}";
+        }
     }
 }

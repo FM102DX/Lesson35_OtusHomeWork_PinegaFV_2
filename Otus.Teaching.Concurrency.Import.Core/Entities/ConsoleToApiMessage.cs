@@ -13,7 +13,7 @@ namespace Otus.Teaching.Concurrency.Import.Core.Entities
 
         public override string ToString()
         {
-            return $"{Text} {TimeStamp} ";
+            return $"{Text}      ---- {TimeStamp} ";
         }
     }
 }

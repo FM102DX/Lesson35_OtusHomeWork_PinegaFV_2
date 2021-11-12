@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="web.config" />
+  </ItemGroup>
+
+  <ItemGroup>
     <_WebToolingArtifacts Remove="Properties\PublishProfiles\api.pubxml" />
     <_WebToolingArtifacts Remove="Properties\PublishProfiles\api2.pubxml" />
   </ItemGroup>

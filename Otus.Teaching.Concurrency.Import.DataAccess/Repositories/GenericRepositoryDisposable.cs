@@ -9,7 +9,7 @@ using Otus.Teaching.Concurrency.Import.DataAccess.Data;
 
 namespace Otus.Teaching.Concurrency.Import.DataAccess.Repositories
 {
-    public class GenericRepositoryDisposable<T> : GenericRepository<T>, IGenericRepositoryDisposable<T>, IDisposable where T : KeepableClass
+    public class GenericRepositoryDisposable<T> : GenericEFRepository<T>, IGenericRepositoryDisposable<T>, IDisposable where T : KeepableClass
     {
         public void Dispose()
         {

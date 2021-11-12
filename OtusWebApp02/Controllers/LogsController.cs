@@ -10,55 +10,44 @@ using Otus.Teaching.Concurrency.Import.DataAccess.Data;
 using Otus.Teaching.Concurrency.Import.Core.Service;
 using Microsoft.AspNetCore.Http;
 
-
 namespace OtusREST.Controllers
 {
 
     [ApiController]
-    [Route("[controller]")]
-    public class CustomersController : Controller
+    [Route("/")]
+    public class LogsController : Controller
     {
         
-        IGenericRepository<Customer>  _repo;
+        IGenericRepository<ConsoleToApiMessage> _messagesRepository;
+        IGenericRepository<Customer> _customersRepository;
 
-        public CustomersController(IGenericRepository<Customer> repo)
+        public LogsController(IGenericRepository<ConsoleToApiMessage> messagesRepository, IGenericRepository<Customer> customersRepository)
         {
-            _repo = repo;
-        }
-        
-        [HttpGet]
-        public string Get()
-        {
-            return "Hi! This is customers controller!";
+            _messagesRepository = messagesRepository;
+            _customersRepository = customersRepository;
         }
 
-        /*
-        [HttpGet("{id}")]
-        public Customer Get(int id)
-        {
-            return this._repo.GetItemById(id);
-        }
-        
         [HttpGet]
-        [Route("getall/")]
-        public IEnumerable<Customer> GetAll()
+        public IActionResult Get()
         {
-            return _repo.GetAllItems();
+            var viewModel = new LogViewModel()
+            {
+                MyMessagesList = _messagesRepository.GetAllItems(),
+                MyCustomersList = _customersRepository.GetAllItems()
+            };
+            return View("LogIndexView", viewModel);
         }
-        
+
         [HttpPost]
         [Produces("application/json")]
         [Consumes("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ActionResult))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ActionResult))]
-        [Route("/")]
-        public ActionResult AddCustomer([FromBody] Customer customer)
+        public ActionResult Post([FromBody] ConsoleToApiMessage msg)
         {
-            CommonOperationResult rez = _repo.AddItem(customer);
+            CommonOperationResult rez = _messagesRepository.AddItem(msg);
             return Ok(rez);
         }
-        
-        */
 
     }
 }

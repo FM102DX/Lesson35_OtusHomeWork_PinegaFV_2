@@ -8,6 +8,7 @@ using Otus.Teaching.Concurrency.Import.Core.Entities;
 using Otus.Teaching.Concurrency.Import.Core.ViewModels;
 using Otus.Teaching.Concurrency.Import.DataAccess.Data;
 using Otus.Teaching.Concurrency.Import.Core.Service;
+using Microsoft.AspNetCore.Http;
 
 namespace OtusREST.Controllers
 {
@@ -17,11 +18,13 @@ namespace OtusREST.Controllers
     public class Log : Controller
     {
         
-        IGenericRepository<ConsoleToApiMessage> _repo;
+        IGenericRepository<ConsoleToApiMessage> _messagesRepository;
+        IGenericRepository<Customer> _customersRepository;
 
-        public Log(IGenericRepository<ConsoleToApiMessage> repo)
+        public Log(IGenericRepository<ConsoleToApiMessage> messagesRepository, IGenericRepository<Customer> customersRepository)
         {
-            _repo = repo;
+            _messagesRepository = messagesRepository;
+            _customersRepository = customersRepository;
         }
         
         [HttpGet]
@@ -29,17 +32,23 @@ namespace OtusREST.Controllers
         {
             var viewModel = new LogViewModel()
             {
-                MyMessageList = _repo.GetAllItems()
+                MyMessagesList = _messagesRepository.GetAllItems(),
+                MyCustomersList = _customersRepository.GetAllItems()
             };
             return View("LogIndexView", viewModel);
         }
-
+        /*
         [HttpPost]
-        public ActionResult AddUser(ConsoleToApiMessage msg)
+        [Produces("application/json")]
+        [Consumes("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ActionResult))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ActionResult))]
+        [Route("/")]
+        public ActionResult AddMessage([FromBody] ConsoleToApiMessage msg)
         {
-            CommonOperationResult rez = _repo.AddItem(msg);
+            CommonOperationResult rez = _messagesRepository.AddItem(msg);
             return Ok(rez);
-            
         }
+        */
     }
 }

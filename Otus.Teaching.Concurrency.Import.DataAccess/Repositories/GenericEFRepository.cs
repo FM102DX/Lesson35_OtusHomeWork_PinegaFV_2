@@ -9,19 +9,18 @@ using Otus.Teaching.Concurrency.Import.DataAccess.Data;
 using System.Threading.Tasks;
 using System.Linq;
 using Otus.Teaching.Concurrency.Import.Core.Abstract;
-using Otus.Teaching.Concurrency.Import.Core.Service;
 
 namespace Otus.Teaching.Concurrency.Import.DataAccess.Repositories
 {
-    public class GenericRepository<T> : IGenericRepository<T> where T : KeepableClass, IKeepable
+    public class GenericEFRepository<T> : IGenericRepository<T> where T : KeepableClass, IKeepable
     {
-        //SQLIte через EF
+        //репозиторий, чтобы сохранять объекты через EF
         protected OtusMultiTreadDbContext _context;
         private static readonly object _locker = new object();
 
         public string Guid {get; private set;}
 
-        public GenericRepository(OtusMultiTreadDbContext context)
+        public GenericEFRepository(OtusMultiTreadDbContext context)
         {
             //Создаем репозиторий, проверяем базу, создаем dbcontext
             _context = context;
@@ -48,13 +47,16 @@ namespace Otus.Teaching.Concurrency.Import.DataAccess.Repositories
             //return _dbSet.AsNoTracking(). Where(predicate).ToList();
         }
 
-        public T GetItemById(int id)
+        public T GetItemByIdOrNull(int id)
         {
-            // return _dbSet.Find(id);
-
             return GetByIdOrNullAsync(id).Result;
         }
 
+        public bool Exists (int id)
+        {
+            T targetObejct = GetByIdOrNullAsync(id).Result;
+            return targetObejct == null;
+        }
 
         public string DbContextGuid { get { return _context.Guid; }}
         public async Task<T> GetByIdOrNullAsync(int id)
@@ -65,7 +67,6 @@ namespace Otus.Teaching.Concurrency.Import.DataAccess.Repositories
         public async Task<CommonOperationResult> AddItemAsync(T t)
         {
             Console.WriteLine("Adding item async");
-
             try
             {
                 await _context.Set<T>().AddAsync(t);
@@ -97,13 +98,17 @@ namespace Otus.Teaching.Concurrency.Import.DataAccess.Repositories
 
         public CommonOperationResult UpdateItem(T t)
         {
-            //_context.Entry(t).State = EntityState.Modified;
             _context.Set<T>().Update(t);
             var rez=_context.SaveChanges();
             return CommonOperationResult.sayOk(rez.ToString());
         }
-        public CommonOperationResult Remove(T t)
+        public CommonOperationResult Delete(int id)
         {
+            T t = this.GetItemByIdOrNull(id);
+            if (t == null)
+            {
+                return CommonOperationResult.sayFail($"Id not found: {id}");
+            }
             _context.Set<T>().Remove(t);
             var rez = _context.SaveChanges();
             return CommonOperationResult.sayOk(rez.ToString());
@@ -123,8 +128,7 @@ namespace Otus.Teaching.Concurrency.Import.DataAccess.Repositories
         {
             try
             {
-                 var rez= await _context.Set<T>().ToListAsync();
-
+                var rez= await _context.Set<T>().ToListAsync();
                 return rez;
             }
             catch (Exception ex)
@@ -132,21 +136,12 @@ namespace Otus.Teaching.Concurrency.Import.DataAccess.Repositories
                 Console.WriteLine($"Error: {ex.Message}");
                 return new List<T>();  
             }
-            
         }
 
         public void PrintItemListToFile(string path)
         {
             FileWriter file = new FileWriter(path);
             int counter = 0;
-
-            /*
-            _dbSet.ForEachAsync(x => {
-                file.DoWrite(x.ToString());
-                counter++;
-            });
-            */
-
             IEnumerable<T> z = GetAllAsync().Result;
             foreach (var x in z)
             {

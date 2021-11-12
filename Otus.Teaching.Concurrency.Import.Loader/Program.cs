@@ -11,7 +11,12 @@ using Otus.Teaching.Concurrency.Import.DataAccess.Repositories;
 using Otus.Teaching.Concurrency.Import.DataAccess.Data;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
+using Otus.Teaching.Concurrency.Import.Core.Service;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using System.Text;
 
 namespace Otus.Teaching.Concurrency.Import.Loader
 {
@@ -19,6 +24,7 @@ namespace Otus.Teaching.Concurrency.Import.Loader
     {
         private static string _dataFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "customers.csv");
         private static string _printFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "customersDump.txt");
+        private static string _postErrorPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "error.html");
         private static string _generatorAppLaunchPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Otus.Teaching.Concurrency.Import.DataGenerator.App.exe");
         private static int _treadCount = 1;
         private static int _recordsCount = 10;
@@ -38,6 +44,10 @@ namespace Otus.Teaching.Concurrency.Import.Loader
             context.Database.EnsureDeleted();
             context.Database.EnsureCreated();
 
+
+            var client = new System.Net.Http.HttpClient(new HttpClientHandler());
+            client.BaseAddress = new Uri(WebApiAddress);
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             do
             {
@@ -92,13 +102,9 @@ namespace Otus.Teaching.Concurrency.Import.Loader
 
                     case 6:
                         //отправляем рандомный текст на сервер
-                        using (var client = new System.Net.Http.HttpClient())
-                        {
+                            string strPostRez = "";
                             Console.WriteLine($"Введите сообщение");
                             var s = Console.ReadLine();
-                            client.BaseAddress = new Uri(WebApiAddress);
-                            client.DefaultRequestHeaders.Accept.Clear();
-                            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
                             ConsoleToApiMessage msg = new ConsoleToApiMessage()
                             {
@@ -106,30 +112,30 @@ namespace Otus.Teaching.Concurrency.Import.Loader
                                 TimeStamp = DateTime.Now
                             };
 
-                            var response = client.PostAsJsonAsync<ConsoleToApiMessage>("", msg).Result;
-                            Console.WriteLine($"Server reply: code={response.StatusCode} ");
-                            Console.WriteLine($"Server reply: {response.Content.ReadAsStringAsync().Result} ");
 
-                            
-                            //var response2 = client.PostAsync("users/", user, new JsonMediaTypeFormatter());
-                        }
+                        var json = JsonConvert.SerializeObject(msg, Formatting.Indented,
+                                new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() });
+
+                        var jsonContent = new StringContent(json, Encoding.UTF8, "application/json");
+
+                        var response6 = client.PostAsync($"", jsonContent);
+
+                        strPostRez = response6.Result.Content.ReadAsStringAsync().Result;
+                        Console.WriteLine($"Server reply: code={response6.Result.StatusCode} ");
+                        Console.WriteLine($"Server reply: {strPostRez} ");
+
                         break;
 
 
 
                     case 7:
                         //тестовый get-запрос
-                        using (var client = new HttpClient())
-                        {
-                            client.BaseAddress = new Uri(WebApiAddress);
-                            client.DefaultRequestHeaders.Accept.Clear();
-                            
-                            var response = client.GetAsync("").Result;
+                           
+                            var response7 = client.GetAsync("").Result;
 
-                            Console.WriteLine($"Server reply: code={response.StatusCode} ");
-                            Console.WriteLine($"Server reply: {response.Content.ReadAsStringAsync().Result}");
+                            Console.WriteLine($"Server reply: code={response7.StatusCode} ");
+                            Console.WriteLine($"Server reply: {response7.Content.ReadAsStringAsync().Result}");
                             
-                        }
                         break;
 
                     case 9:

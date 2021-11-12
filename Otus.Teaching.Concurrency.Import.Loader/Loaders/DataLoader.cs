@@ -102,7 +102,7 @@ namespace Otus.Teaching.Concurrency.Import.Core.Loaders
                         {
                             for (int i = 0; i < Program.numberOfTries; i++)
                             {
-                                repository.AddItemAsync(customer);
+                                repository.AddItem(customer);
                                 break;
                             }
                         }
@@ -112,7 +112,6 @@ namespace Otus.Teaching.Concurrency.Import.Core.Loaders
                             Thread.Sleep(Program.threadWaitSleepMs);
                         }
                     }
-                    repository.SaveChanges();
                 }
                 
                 sw.Stop();

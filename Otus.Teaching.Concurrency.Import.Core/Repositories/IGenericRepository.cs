@@ -15,26 +15,25 @@ namespace Otus.Teaching.Concurrency.Import.Core.Repositories
 
         public long Count { get; }
 
-        public string Guid { get; }
-        public string DbContextGuid { get; }
+        public bool Exists(int id);
 
-        public Task<CommonOperationResult> AddItemAsync(T t);
+        public string Guid { get; }
+
+        public string DbContextGuid { get; }
 
         public CommonOperationResult AddItem(T t);
 
         public CommonOperationResult UpdateItem(T t);
 
-        public CommonOperationResult Remove(T t);
+        public CommonOperationResult Delete(int id);
 
-        public T GetItemById(int id);
+        public T GetItemByIdOrNull(int id);
 
         public IEnumerable<T> GetAllItems();
 
         public void PrintItemListToConsole();
 
         public void PrintItemListToFile(string path);
-
-        public void SaveChanges();
 
         public void PrepareDb();
     }
