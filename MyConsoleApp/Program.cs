@@ -35,8 +35,7 @@ namespace MyConsoleApp
         private const string WebApiAddress = "https://api.ricompany.info/";
 
         private static string token;
-
-        
+                
 
         static void Main(string[] args)
         {
